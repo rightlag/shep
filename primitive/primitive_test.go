@@ -28,4 +28,22 @@ func TestValidationVisitor(t *testing.T) {
 	if err := r.Accept(&ValidationVisitor{instance}); err == nil {
 		t.Error("")
 	}
+	a := &Array{
+		Items: []Component{
+			&String{MaxLength: 10},
+			&String{MinLength: 4},
+		},
+		MinItems: 1,
+	}
+	instance = []interface{}{"cold", "ice"}
+	if err := a.Accept(&ValidationVisitor{instance}); err == nil {
+		t.Error("")
+	}
+	instance = []interface{}{"cold", "ice"}
+	a = &Array{
+		Items: &String{MaxLength: 2},
+	}
+	if err := a.Accept(&ValidationVisitor{instance}); err == nil {
+		t.Error("")
+	}
 }
