@@ -63,11 +63,9 @@ func (v *ValidationVisitor) VisitRecord(r *Record) error {
 			if _, ok := properties.(map[string]interface{})[item]; !ok {
 				return fmt.Errorf("object instance is not valid")
 			}
-		}
-	}
-	if _, ok := v.Instance.(map[string]interface{})["properties"]; ok {
-		if err := r.Properties.Accept(v); err != nil {
-			return fmt.Errorf("")
+			if err := r.Properties.Accept(v); err != nil {
+				return fmt.Errorf("")
+			}
 		}
 	}
 	return nil
