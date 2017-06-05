@@ -20,10 +20,8 @@ func TestValidationVisitor(t *testing.T) {
 		Required: []string{"firstName", "lastName"},
 	}
 	instance = map[string]interface{}{
-		"properties": map[string]interface{}{
-			"firstName": "John",
-			"lastName":  "Doe",
-		},
+		"firstName": "John",
+		"lastName":  "Doe",
 	}
 	if err := r.Accept(&ValidationVisitor{instance}); err == nil {
 		t.Error("")
@@ -39,11 +37,36 @@ func TestValidationVisitor(t *testing.T) {
 	if err := a.Accept(&ValidationVisitor{instance}); err == nil {
 		t.Error("")
 	}
-	instance = []interface{}{"cold", "ice"}
 	a = &Array{
 		Items: &String{MaxLength: 2},
 	}
 	if err := a.Accept(&ValidationVisitor{instance}); err == nil {
+		t.Error("")
+	}
+	p := &Primitive{
+		AllOf: &AllOf{[]Component{
+			&Record{
+				Properties: Properties(map[string]Component{
+					"firstName": &String{},
+					"lastName":  &String{},
+				}),
+			},
+			&Record{
+				Properties: Properties(map[string]Component{
+					"age": &Integer{
+						MultipleOf: 5,
+						Maximum:    40,
+					},
+				}),
+			},
+		}},
+	}
+	instance = map[string]interface{}{
+		"firstName": "John",
+		"lastName":  "Doe",
+		"age":       45,
+	}
+	if err := p.Accept(&ValidationVisitor{instance}); err == nil {
 		t.Error("")
 	}
 }
