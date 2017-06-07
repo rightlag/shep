@@ -3,6 +3,8 @@ package primitive
 import (
 	"fmt"
 	"math"
+	"net/url"
+	"reflect"
 	"regexp"
 )
 
@@ -16,6 +18,7 @@ type Visitor interface {
 	VisitAllOf(allOf *AllOf) error
 	VisitAnyOf(anyOf *AnyOf) error
 	VisitOneOf(oneOf *OneOf) error
+	VisitReference(r *Reference) error
 }
 
 type Component interface {
@@ -54,9 +57,19 @@ type OneOf struct {
 }
 
 type String struct {
+	Primitive
 	MaxLength uint   `json:"maxLength"`
 	MinLength uint   `json:"minLength"`
 	Pattern   string `json:"pattern"`
+}
+
+func NewString(options ...func(*String)) *String {
+	var s String
+	for _, option := range options {
+		option(&s)
+	}
+	s.Type = "string"
+	return &s
 }
 
 type Record struct {
@@ -83,6 +96,10 @@ type Array struct {
 	Contains        Component   `json:"contains"`
 }
 
+type Reference struct {
+	Value string `json:"$ref"`
+}
+
 type ValidationVisitor struct {
 	Instance interface{}
 }
@@ -92,14 +109,50 @@ type ReferenceVisitor struct {
 }
 
 func (v *ValidationVisitor) VisitPrimitive(p *Primitive) error {
-	if err := p.AllOf.Accept(v); err != nil {
-		return err
+	if p.Enum != nil {
+		var found bool
+		for _, element := range p.Enum {
+			if v.Instance == element {
+				found = true
+			}
+		}
+		if !found {
+			return fmt.Errorf("instance is not valid")
+		}
+	}
+	if p.Const != nil {
+		if reflect.TypeOf(v.Instance) == reflect.TypeOf(p.Const) {
+			if !(reflect.ValueOf(v.Instance) == reflect.ValueOf(p.Const)) {
+				return fmt.Errorf("instance is not valid")
+			}
+		}
+	}
+	if p.Type != nil {
+		// types := []string{"null", "boolean", "object", "array", "number", "string", "integer"}
+		// TODO: add validation for `type`
+	}
+	if p.AllOf != nil {
+		if err := p.AllOf.Accept(v); err != nil {
+			return err
+		}
+	}
+	if p.Not != nil {
+		if err := p.Not.Accept(&ValidationVisitor{v.Instance}); err == nil {
+			return fmt.Errorf("instance is not valid")
+		}
 	}
 	return nil
 }
 
 func (v *ValidationVisitor) VisitString(s *String) error {
-	instance := v.Instance.(string)
+	instance, ok := v.Instance.(string)
+	if !ok {
+		// http://json-schema.org/latest/json-schema-validation.html#rfc.section.4.1
+		return nil
+	}
+	if err := s.Primitive.Accept(v); err != nil {
+		return err
+	}
 	if s.MaxLength > 0 {
 		if !(uint(len(instance)) <= s.MaxLength) {
 			return fmt.Errorf("string instance is not valid")
@@ -108,8 +161,15 @@ func (v *ValidationVisitor) VisitString(s *String) error {
 	if !(uint(len(instance)) >= s.MinLength) {
 		return fmt.Errorf("string instance is not valid")
 	}
-	if _, err := regexp.Compile(instance); err != nil {
-		return err
+	if s.Pattern != "" {
+		r, err := regexp.Compile(s.Pattern)
+		if err != nil {
+			return err
+		}
+		matches := r.FindAllString(instance, -1)
+		if len(matches) < 1 {
+			return fmt.Errorf("string instance is not valid")
+		}
 	}
 	return nil
 }
@@ -154,7 +214,10 @@ func (v *ValidationVisitor) VisitProperties(properties Properties) error {
 }
 
 func (v *ValidationVisitor) VisitInteger(i *Integer) error {
-	instance := v.Instance.(int)
+	instance, ok := v.Instance.(int)
+	if !ok {
+		return nil
+	}
 	if i.MultipleOf > 0 {
 		remainder := math.Remainder(float64(instance), i.MultipleOf)
 		if !(remainder == 0.0) {
@@ -232,6 +295,15 @@ func (v *ValidationVisitor) VisitOneOf(oneOf *OneOf) error {
 	return nil
 }
 
+func (v *ValidationVisitor) VisitReference(r *Reference) error {
+	u, err := url.Parse(r.Value)
+	if err != nil {
+		return err
+	}
+	r.Value = u.String()
+	return nil
+}
+
 func (p *Primitive) Accept(visitor Visitor) error {
 	return visitor.VisitPrimitive(p)
 }
@@ -266,4 +338,8 @@ func (anyOf *AnyOf) Accept(visitor Visitor) error {
 
 func (oneOf *OneOf) Accept(visitor Visitor) error {
 	return visitor.VisitOneOf(oneOf)
+}
+
+func (r *Reference) Accept(visitor Visitor) error {
+	return visitor.VisitReference(r)
 }
