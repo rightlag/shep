@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/rightlag/shep.svg?token=kDZcsygosGgqF2WJJ1jZ&branch=master)](https://travis-ci.com/rightlag/shep)
+[![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep)
 
 # License
 
