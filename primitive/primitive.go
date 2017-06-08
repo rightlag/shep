@@ -15,10 +15,9 @@ type Visitor interface {
 	VisitInteger(i *Integer) error
 	VisitProperties(p Properties) error
 	VisitArray(a *Array) error
-	VisitAllOf(allOf *AllOf) error
-	VisitAnyOf(anyOf *AnyOf) error
-	VisitOneOf(oneOf *OneOf) error
 	VisitReference(r *Reference) error
+	VisitBoolean(b *Boolean) error
+	VisitNull(n *Null) error
 }
 
 type Component interface {
@@ -29,9 +28,9 @@ type Primitive struct {
 	Enum        []interface{} `json:"enum"`
 	Const       interface{}   `json:"const"`
 	Type        interface{}   `json:"type"`
-	AllOf       *AllOf        `json:"allOf"`
-	AnyOf       *AnyOf        `json:"anyOf"`
-	OneOf       *OneOf        `json:"oneOf"`
+	AllOf       []Component   `json:"allOf"`
+	AnyOf       []Component   `json:"anyOf"`
+	OneOf       []Component   `json:"oneOf"`
 	Not         Component     `json:"not"`
 	Definitions Definitions   `json:"definitions"`
 	Title       string        `json:"title"`
@@ -44,18 +43,6 @@ type Properties map[string]Component
 
 type Definitions map[string]Component
 
-type AllOf struct {
-	elements []Component
-}
-
-type AnyOf struct {
-	elements []Component
-}
-
-type OneOf struct {
-	elements []Component
-}
-
 type String struct {
 	Primitive
 	MaxLength uint   `json:"maxLength"`
@@ -64,6 +51,7 @@ type String struct {
 }
 
 func NewString(options ...func(*String)) *String {
+	// Proposed by Rob Pike: https://commandcenter.blogspot.nl/2014/01/self-referential-functions-and-design.html
 	var s String
 	for _, option := range options {
 		option(&s)
@@ -73,13 +61,24 @@ func NewString(options ...func(*String)) *String {
 }
 
 type Record struct {
+	Primitive
 	MaxProperties uint       `json:"maxProperties"`
 	MinProperties uint       `json:"minProperties"`
 	Required      []string   `json:"required"`
 	Properties    Properties `json:"properties"`
 }
 
+func NewRecord(options ...func(*Record)) *Record {
+	var r Record
+	for _, option := range options {
+		option(&r)
+	}
+	r.Type = "object"
+	return &r
+}
+
 type Integer struct {
+	Primitive
 	MultipleOf       float64 `json:"multipleOf"`
 	Maximum          float64 `json:"maximum"`
 	ExclusiveMaximum bool    `json:"exclusiveMaximum"`
@@ -87,13 +86,58 @@ type Integer struct {
 	ExclusiveMinimum bool    `json:"exclusiveMinimum"`
 }
 
+func NewInteger(options ...func(*Integer)) *Integer {
+	var i Integer
+	for _, option := range options {
+		option(&i)
+	}
+	i.Type = "integer"
+	return &i
+}
+
 type Array struct {
+	Primitive
 	Items           interface{} `json:"items"`
 	AdditionalItems Component   `json:"additionalItems"`
 	MaxItems        uint        `json:"maxItems"`
 	MinItems        uint        `json:"minItems"`
 	UniqueItems     bool        `json:"uniqueItems"`
 	Contains        Component   `json:"contains"`
+}
+
+func NewArray(options ...func(*Array)) *Array {
+	var a Array
+	for _, option := range options {
+		option(&a)
+	}
+	a.Type = "array"
+	return &a
+}
+
+type Boolean struct {
+	Primitive
+}
+
+func NewBoolean(options ...func(*Boolean)) *Boolean {
+	var b Boolean
+	for _, option := range options {
+		option(&b)
+	}
+	b.Type = "boolean"
+	return &b
+}
+
+type Null struct {
+	Primitive
+}
+
+func NewNull(options ...func(*Null)) *Null {
+	var n Null
+	for _, option := range options {
+		option(&n)
+	}
+	n.Type = "null"
+	return &n
 }
 
 type Reference struct {
@@ -131,8 +175,8 @@ func (v *ValidationVisitor) VisitPrimitive(p *Primitive) error {
 		// types := []string{"null", "boolean", "object", "array", "number", "string", "integer"}
 		// TODO: add validation for `type`
 	}
-	if p.AllOf != nil {
-		if err := p.AllOf.Accept(v); err != nil {
+	for _, element := range p.AllOf {
+		if err := element.Accept(&ValidationVisitor{v.Instance}); err != nil {
 			return err
 		}
 	}
@@ -175,7 +219,13 @@ func (v *ValidationVisitor) VisitString(s *String) error {
 }
 
 func (v *ValidationVisitor) VisitRecord(r *Record) error {
-	instance := v.Instance.(map[string]interface{})
+	instance, ok := v.Instance.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+	if err := r.Primitive.Accept(v); err != nil {
+		return err
+	}
 	if r.MaxProperties > 0 {
 		if !(uint(len(instance)) <= r.MaxProperties) {
 			return fmt.Errorf("object instance is not valid")
@@ -218,14 +268,19 @@ func (v *ValidationVisitor) VisitInteger(i *Integer) error {
 	if !ok {
 		return nil
 	}
+	if err := i.Primitive.Accept(v); err != nil {
+		return err
+	}
 	if i.MultipleOf > 0 {
 		remainder := math.Remainder(float64(instance), i.MultipleOf)
 		if !(remainder == 0.0) {
 			return fmt.Errorf("numeric instance is not valid")
 		}
 	}
-	if !(float64(instance) <= i.Maximum) {
-		return fmt.Errorf("numeric instance is not valid")
+	if i.Maximum > 0 {
+		if !(float64(instance) <= i.Maximum) {
+			return fmt.Errorf("numeric instance is not valid")
+		}
 	}
 	if i.ExclusiveMaximum {
 		if !(float64(instance) < i.Maximum) {
@@ -244,7 +299,13 @@ func (v *ValidationVisitor) VisitInteger(i *Integer) error {
 }
 
 func (v *ValidationVisitor) VisitArray(a *Array) error {
-	instance := v.Instance.([]interface{})
+	instance, ok := v.Instance.([]interface{})
+	if !ok {
+		return nil
+	}
+	if err := a.Primitive.Accept(v); err != nil {
+		return err
+	}
 	switch a.Items.(type) {
 	case Component:
 		for _, element := range instance {
@@ -271,15 +332,7 @@ func (v *ValidationVisitor) VisitArray(a *Array) error {
 	return nil
 }
 
-func (v *ValidationVisitor) VisitAllOf(allOf *AllOf) error {
-	for _, element := range allOf.elements {
-		if err := element.Accept(&ValidationVisitor{v.Instance}); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
+/*
 func (v *ValidationVisitor) VisitAnyOf(anyOf *AnyOf) error {
 	// TODO: add validation for `anyOf`
 	var count int
@@ -290,8 +343,26 @@ func (v *ValidationVisitor) VisitAnyOf(anyOf *AnyOf) error {
 	}
 	return nil
 }
+*/
 
-func (v *ValidationVisitor) VisitOneOf(oneOf *OneOf) error {
+func (v *ValidationVisitor) VisitBoolean(b *Boolean) error {
+	_, ok := v.Instance.(bool)
+	if !ok {
+		return nil
+	}
+	if err := b.Primitive.Accept(v); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (v *ValidationVisitor) VisitNull(n *Null) error {
+	if v.Instance != nil {
+		return nil
+	}
+	if err := n.Primitive.Accept(v); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -328,16 +399,12 @@ func (a *Array) Accept(visitor Visitor) error {
 	return visitor.VisitArray(a)
 }
 
-func (allOf *AllOf) Accept(visitor Visitor) error {
-	return visitor.VisitAllOf(allOf)
+func (b *Boolean) VisitBoolean(visitor Visitor) error {
+	return visitor.VisitBoolean(b)
 }
 
-func (anyOf *AnyOf) Accept(visitor Visitor) error {
-	return visitor.VisitAnyOf(anyOf)
-}
-
-func (oneOf *OneOf) Accept(visitor Visitor) error {
-	return visitor.VisitOneOf(oneOf)
+func (n *Null) VisitNull(visitor Visitor) error {
+	return visitor.VisitNull(n)
 }
 
 func (r *Reference) Accept(visitor Visitor) error {
