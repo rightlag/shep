@@ -1,12 +1,24 @@
 <p align="center">
-  <img src="assets/title.png">
+  <a href="https://github.com/rightlag/shep"><img src="assets/title.png"></a>
 </p>
 
 > Validate client-submitted data using the [JSON Schema](http://json-schema.org/) vocabulary ✔
 
 [![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep) [![Go Report Card](https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square)](https://goreportcard.com/report/github.com/rightlag/shep)
 
-shep is a Go library that parses JSON Schema vocabulary and validates client-submitted data.
+shep is a Go library that parses JSON Schema vocabulary documents and validates client-submitted data. It supports validation for the seven primitive types defined below:
+
+- `null`
+- `boolean`
+- `object`
+- `array`
+- `number`
+- `integer`
+- `string`
+
+# Testing
+
+    $ go test ./... -v
 
 # License
 
