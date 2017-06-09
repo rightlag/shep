@@ -2,9 +2,11 @@
   <img src="assets/title.png">
 </p>
 
+> Validate client-submitted data using the [JSON Schema](http://json-schema.org/) vocabulary ✔
+
 [![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep) [![Go Report Card](https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square)](https://goreportcard.com/report/github.com/rightlag/shep)
 
-> Validate client-submitted data using the [JSON Schema](http://json-schema.org/) vocabulary ✔
+shep is a Go library that parses JSON Schema vocabulary and validates client-submitted data.
 
 # License
 
