@@ -2,10 +2,7 @@
   <img src="assets/title.png">
 </p>
 
-<p align="center">
-  <a href="https://travis-ci.org/rightlag/shep"><img src="https://img.shields.io/travis/rightlag/shep.svg?style=flat-square" alt="Build Status"></a>
-  <a href="https://goreportcard.com/report/github.com/rightlag/shep"><img src="https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square" alt="Go Report Card"></a>
-</p>
+[![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep) [![Go Report Card](https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square)](https://goreportcard.com/report/github.com/rightlag/shep)
 
 > Validate client-submitted data using the [JSON Schema](http://json-schema.org/) vocabulary ✔
 
