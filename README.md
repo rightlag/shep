@@ -1,4 +1,12 @@
-[![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep) [![Go Report Card](https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square)](https://goreportcard.com/report/github.com/rightlag/shep)
+<p align="center">
+  <img src="assets/title.png">
+</p>
+
+<center>
+  [![Build Status](https://img.shields.io/travis/rightlag/shep.svg?style=flat-square)](https://travis-ci.org/rightlag/shep) [![Go Report Card](https://goreportcard.com/badge/github.com/rightlag/shep?style=flat-square)](https://goreportcard.com/report/github.com/rightlag/shep)
+</center>
+
+> Validate client-submitted data using the [JSON Schema](http://json-schema.org/) vocabulary ✔
 
 # License
 
