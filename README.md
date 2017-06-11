@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/rightlag/shep"><img src="https://raw.githubusercontent.com/rightlag/shep/master/assets/title.svg" alt="shep"></a>
+  <a href="https://github.com/rightlag/shep"><img src="https://cdn.rawgit.com/rightlag/shep/master/assets/title.svg" alt="shep"></a>
 </p>
 
 <p align="center">
