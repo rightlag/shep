@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="248px" height="400px" viewBox="0 0 248 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="264px" height="377px" viewBox="0 0 264 377" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
     <title>shep</title>
+    <desc>Created with Sketch.</desc>
     <defs></defs>
-    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <circle id="Oval" stroke="#00E676" stroke-width="8" cx="124" cy="124" r="120"></circle>
-        <text font-family="Montserrat-Thin, Montserrat" font-size="72" font-style="condensed" font-weight="300" letter-spacing="10" fill="#757575">
-            <tspan x="12" y="340">SHEP</tspan>
-        </text>
-        <text font-family="ZapfDingbatsITC, Zapf Dingbats" font-size="72" font-weight="normal" fill="#00E676">
-            <tspan x="93" y="144">✔</tspan>
-        </text>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(4.000000, 4.000000)">
+            <path d="M158.461967,80.0217292 C163.624967,79.5527292 165.133967,86.7757292 161.461967,92.0217292 C147.461967,112.021729 139.461967,137.021729 132.364967,157.017729 C130.334967,162.739729 124.801967,174.214729 120.160967,175.791729 C114.029967,177.875729 107.159967,174.772729 104.672967,170.628729 C101.857967,165.935729 96.5929673,154.759729 93.8779673,145.752729 C93.1109673,143.207729 91.9619673,139.612729 92.0009673,136.835729 C92.0799673,131.114729 98.9939673,119.189729 105.611967,122.754729 C109.013967,124.586729 112.702967,144.431729 118.754967,143.875729 C121.262967,143.644729 123.893967,133.681729 125.461967,129.021729 C129.781967,116.187729 135.433967,105.061729 142.461967,95.0217292 C149.461967,85.0217292 152.892967,80.7227292 158.461967,80.0217292 Z" id="Shape" fill="#00E676" fill-rule="nonzero"></path>
+            <circle id="Oval" stroke="#00E676" stroke-width="8" cx="128" cy="128" r="128"></circle>
+            <text id="SHEP" font-family="Montserrat-Thin, Montserrat" font-size="72" font-style="condensed" font-weight="300" letter-spacing="10" fill="#000000">
+                <tspan x="10.872" y="355">SHEP</tspan>
+            </text>
+        </g>
     </g>
 </svg>
