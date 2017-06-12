@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="248px" height="357px" viewBox="0 0 248 357" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 44.1 (41455) - http://www.bohemiancoding.com/sketch -->
-    <title>shep 2</title>
-    <desc>Created with Sketch.</desc>
+<svg width="248px" height="400px" viewBox="0 0 248 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shep</title>
     <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <circle id="Oval" stroke="#00E676" stroke-width="8" cx="124" cy="124" r="120"></circle>
-        <text id="SHEP" font-family="Montserrat-Thin, Montserrat" font-size="72" font-style="condensed" font-weight="300" letter-spacing="10" fill="#757575">
-            <tspan x="11.872" y="339">SHE</tspan>
-            <tspan x="188.464" y="339">P</tspan>
+        <text font-family="Montserrat-Thin, Montserrat" font-size="72" font-style="condensed" font-weight="300" letter-spacing="10" fill="#757575">
+            <tspan x="12" y="340">SHEP</tspan>
         </text>
-        <text id="✔" font-family="ZapfDingbatsITC, Zapf Dingbats" font-size="72" font-weight="normal" fill="#00E676">
+        <text font-family="ZapfDingbatsITC, Zapf Dingbats" font-size="72" font-weight="normal" fill="#00E676">
             <tspan x="93" y="144">✔</tspan>
         </text>
     </g>
