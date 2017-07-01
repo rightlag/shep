@@ -52,12 +52,12 @@ func (v *ValidationVisitor) VisitPrimitive(p *Primitive) error {
 		// TODO: add validation for `type`
 	}
 	for _, element := range p.AllOf {
-		if err := element.Accept(&ValidationVisitor{v.Instance}); err != nil {
+		if err := element.Accept(v); err != nil {
 			return err
 		}
 	}
 	if p.Not != nil {
-		if err := p.Not.Accept(&ValidationVisitor{v.Instance}); err == nil {
+		if err := p.Not.Accept(v); err == nil {
 			return fmt.Errorf("instance is not valid")
 		}
 	}
